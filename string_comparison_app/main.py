@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 import textdistance
-from streamlit_scripts import find_similarities
+from streamlit_scripts import find_similarities, textdistance_streamlit_code
+
 
 # df = pd.DataFrame()
 # data = {
@@ -51,10 +52,10 @@ def main():
     # multiselect_sidebar_4 = st.sidebar.multiselect("Select one or more 'Compression based' algorithms", text_algorithms)
     # multiselect_sidebar_5 = st.sidebar.multiselect("Select one or more 'Phonetic' algorithms", text_algorithms)
     multiselect_algorithm_methods = list(map(edit_based_algorithms.get, multiselect_sidebar_1))
-
-    if multiselect_sidebar_1 is not None:
-        st.write(multiselect_algorithm_methods)
-
+    st.header("textdistance app")
+    with st.expander("See explanation and instructions about the project"):
+        st.subheader("README")
+        st.write("The purpose of this script is to...")
     col1, col2 = st.columns((1, 1))
     if radio_button_1 == radio_options[0]:
         file = col1.file_uploader(label='Select a file')
@@ -71,25 +72,27 @@ def main():
         else:
             col1.write("")
     elif radio_button_1 == radio_options[1]:
-
+        col1, col2, col3, col4 = st.columns((2, 1, 2, 1))
         file_1 = col1.file_uploader(label='Select a file')
-        file_2 = col2.file_uploader(label='Select another file')
+        file_2 = col3.file_uploader(label='Select another file')
 
         if file_1 is not None and file_2 is not None and multiselect_sidebar_1 is not None:
 
             first_df = pd.read_excel(file_1, engine='openpyxl')
             second_df = pd.read_excel(file_2, engine='openpyxl')
             # option_1 = col1.multiselect("Multiselect", [*df_1.columns.values, *df_2.columns.values]
+            col1, col2, col3, col4 = st.columns((1, 2, 1, 2))
             option_1 = col1.selectbox("Select header from first file", convert_tuple(first_df.columns.values))
-            option_2 = col2.selectbox("Select item from second file", convert_tuple(second_df.columns.values))
+            option_2 = col3.selectbox("Select item from second file", convert_tuple(second_df.columns.values))
+            if st.button('Refresh Data'):
+                df = find_similarities(df_1=first_df, df_2=second_df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=3, algo_list=multiselect_algorithm_methods)
+                col1, col2 = st.columns((5, 2))
+                col1.write(f"With a Similarity Threshold of {slider_button_1} and a Maximum of {slider_button_2} matches per record in the first file")
+                st.write(df)
             col1, col2 = st.columns((1, 1))
-            df = find_similarities(df_1=first_df, df_2=second_df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=3, algo_list=multiselect_algorithm_methods)
-            col1, col2 = st.columns((5, 2))
-            col1.write(f"With a Similarity Threshold of {slider_button_1} and a Maximum of {slider_button_2} matches per record in the first file")
-
-
-
-            st.write(df.head(1000))
+            code_checkbox = col1.checkbox("View Source Code")
+            if code_checkbox:
+                st.code(textdistance_streamlit_code(), language='python')
 
         else:
             st.markdown("***")
