@@ -3,19 +3,6 @@ import pandas as pd
 import textdistance
 from streamlit_scripts import find_similarities, textdistance_streamlit_code
 
-import time
-
-# df = pd.DataFrame()
-# data = {
-#     'column_1': 'data',
-#     'column_2': 'data',
-#     'column_3': 'data',
-#     'column_4': 'data'
-# }
-# df = df.append(data, ignore_index=True)
-#
-# st.write("Hello World")
-# st.write(test())
 
 def convert_tuple(list):
     return (*list, )
@@ -25,7 +12,7 @@ def main():
     st.set_page_config(layout="wide")
     radio_options = ['1 Excel File', '2 Excel File']
     radio_button_1 = st.sidebar.radio("Select an Option", radio_options)
-    edit_based_algorithms ={'Hamming': 'hamming',
+    dict_algorithms ={'Hamming': 'hamming',
                             'MLIPNS': 'mlipns',
                             'Levenshtein': 'levenshtein',
                             'Damerau-Levenshtein': 'damerau_levenshtein',
@@ -35,18 +22,28 @@ def main():
                             'Gotoh': 'gotoh',
                             'Smith-Waterman': 'smith_waterman'
                             }
-    # token_based_algorithms = ['Hamming', 'MLIPNS', 'Levenshtein', 'Damerau-Levenshtein','Jaro-Winkler', 'Strcmp95', 'Needleman-Wunsch', 'Gotoh']
+
+    dict_algorithm_methods ={
+                            'Normalized Similarity': 'normalized_similarity',
+                            'Normalized distance': 'normalized_distance',
+                            'Distance': 'distance',
+                            'Similarity': 'similarity',
+                            'Maximum': 'maximum',
+                            }
+
 
 
     slider_button_1 = st.sidebar.slider("Select a Similarity Threshold")
-    slider_button_2 = st.sidebar.slider("Select a Record Limit", max_value=100)
-    multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", edit_based_algorithms)
-    # multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more 'Token based' algorithms", token_based_algorithms)
-    # multiselect_sidebar_3 = st.sidebar.multiselect("Select one or more 'Sequence based' algorithms", text_algorithms)
-    # multiselect_sidebar_4 = st.sidebar.multiselect("Select one or more 'Compression based' algorithms", text_algorithms)
-    # multiselect_sidebar_5 = st.sidebar.multiselect("Select one or more 'Phonetic' algorithms", text_algorithms)
-    multiselect_algorithm_methods = list(map(edit_based_algorithms.get, multiselect_sidebar_1))
-    new_title = '<p style="font-family:sans-serif; color:Red; font-size: 60px;">textdistance app</p>'
+    slider_button_2 = st.sidebar.slider("Select a Record Limit", min_value=1, max_value=100)
+    multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", dict_algorithms)
+    multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more algorithm methods", dict_algorithm_methods)
+    slider_button_3 = st.sidebar.slider("Split sequences into n-grams", min_value=1, max_value=10)
+    st.sidebar.markdown("\n\n\n\n***")
+    with st.sidebar.expander("Resources"):
+        st.write("[What is an n-gram?](https://en.wikipedia.org/wiki/N-gram)")
+        st.write("")
+    multiselect_algorithm_methods = list(map(dict_algorithms.get, multiselect_sidebar_1))
+    new_title = '<p style="font-family:sans-serif; color:Red; font-size: 60px;">TextDistance App</p>'
     col1, col2, col3 = st.columns((2, 1, 1))
 
     col1.markdown(new_title, unsafe_allow_html=True)
@@ -54,9 +51,9 @@ def main():
         st.subheader("Goal")
         st.write("""The purpose of this app is to democratize the use of the [textdistance library](https://pypi.org/project/textdistance/). The script in the background
         takes one or more tabular datasets **(-> DataFrames)**, processes the data based on user specifications in the sidebar and the fields chosen to measure. 
-        The *find_similarities()* function found at the bottom of this app to get the """)
+        The *find_similarities()* function found at the bottom of this app to get the source code.""")
         st.subheader("Outcomes")
-        st.write("(A) Normalized Similarity of 2 Fields with one or more algorithms from the textdistance library.")
+        st.write("(A) Normalized Similarity of 2 Fields of the user's choosing with one or more algorithms from the textdistance library.")
         st.write("(B) A downloadable CSV of the Output")
     with col3.expander("How to use this app"):
         st.subheader("Files")
@@ -80,8 +77,9 @@ def main():
             option_1 = col1.selectbox("Select header from first file", convert_tuple(df.columns.values))
             option_2 = col2.selectbox("Select item from second file", convert_tuple(df.columns.values))
 
-            df = find_similarities(df_1=df, df_2=df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=3, algo_list=multiselect_algorithm_methods)
+            df = find_similarities(df_1=df, df_2=df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=slider_button_2, algo_list=multiselect_algorithm_methods)
             st.write(f"With a Similarity Threshold of {slider_button_1} and a Maximum of {slider_button_2} matches per record in the first file")
+            st.write(df)
             st.write(df)
         else:
             col1.write("")
@@ -122,18 +120,10 @@ def main():
                 else:
                     st.error("Please select a textdistance algorithm from the sidebar!")
 
-
-
-
-
         else:
             st.markdown("***")
             with st.expander("View Source Code"):
                 st.code(textdistance_streamlit_code(), language='python')
-
-
-    # print(dir(st))
-
 
 if __name__ == "__main__":
 
