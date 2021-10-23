@@ -1,4 +1,4 @@
-### Streamlit TextDistance App
+# Streamlit TextDistance App
 
-# Outcomes
+#### Outcomes
 The purpose
