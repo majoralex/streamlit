@@ -1,26 +1,8 @@
 import streamlit as st
 import pandas as pd
 import textdistance
-from streamlit_scripts import find_similarities
+from streamlit_scripts import find_similarities, textdistance_streamlit_code
 
-# df = pd.DataFrame()
-# data = {
-#     'column_1': 'data',
-#     'column_2': 'data',
-#     'column_3': 'data',
-#     'column_4': 'data'
-# }
-# df = df.append(data, ignore_index=True)
-#
-# st.write("Hello World")
-# st.write(test())
-
-def v_spacer(height, sb=False) -> None:
-    for _ in range(height):
-        if sb:
-            st.sidebar.write('\n')
-        else:
-            st.write('\n')
 
 def convert_tuple(list):
     return (*list, )
@@ -28,9 +10,11 @@ def convert_tuple(list):
 def main():
 
     st.set_page_config(layout="wide")
-    radio_options = ['1 Excel File', '2 Excel File']
+    radio_options = ['1 Excel or CSV File', '2 Excel and/or CSV Files']
     radio_button_1 = st.sidebar.radio("Select an Option", radio_options)
-    edit_based_algorithms ={'Hamming': 'hamming',
+
+
+    dict_algorithms ={'Hamming': 'hamming',
                             'MLIPNS': 'mlipns',
                             'Levenshtein': 'levenshtein',
                             'Damerau-Levenshtein': 'damerau_levenshtein',
@@ -38,65 +22,182 @@ def main():
                             'Strcmp95': 'strcmp95',
                             'Needleman-Wunsch': 'needleman_wunsch',
                             'Gotoh': 'gotoh',
-                            'Smith-Waterman': 'smith_waterman'
+                            'Smith-Waterman': 'smith_waterman',
+                            'Jaccard': 'jaccard',
+                            'Sørensen–Dice coefficient': 'sorensen',
+                            'Tversky index': 'tversky',
+                            'Overlap coefficient': 'overlap',
+                            'Tanimoto distance': 'tanimoto',
+                            'Cosine similarity': 'cosine',
+                            'Monge-Elkan': 'monge_elkan',
+                            'Bag distance': 'bag',
+                            'longest common subsequence similarity': 'lcsseq',
+                            'longest common substring similarity': 'lcsstr',
+                            'Ratcliff-Obershelp similarity': 'ratcliff_obershelp',
+                            'Arithmetic coding': 'arith_ncd',
+                            'RLE': 'rle_ncd',
+                            'BWT RLE': 'bwtrle_ncd',
+                            'Square Root': 'sqrt_ncd',
+                            'Entropy': 'entropy_ncd',
+                            'BZ2': 'bz2_ncd',
+                            'LZMA': 'lzma_ncd',
+                            'ZLib': 'zlib_ncd',
+                            'MRA': 'mra',
+                            'Editex': 'editex',
+                            'Prefix similarity': 'prefix',
+                            'Postfix similarity': 'postfix',
+                            'Length distance': 'length',
+                            'Identity similarity': 'identity',
+                            'Matrix similarity': 'matrix'
+                        }
+    dict_algorithm_methods ={
+                            'Normalized Similarity': 'normalized_similarity',
+                            'Normalized distance': 'normalized_distance',
+                            'Distance': 'distance',
+                            'Similarity': 'similarity',
+                            'Maximum': 'maximum',
                             }
-    # token_based_algorithms = ['Hamming', 'MLIPNS', 'Levenshtein', 'Damerau-Levenshtein','Jaro-Winkler', 'Strcmp95', 'Needleman-Wunsch', 'Gotoh']
+
 
 
     slider_button_1 = st.sidebar.slider("Select a Similarity Threshold")
-    slider_button_2 = st.sidebar.slider("Select a Record Limit", max_value=20)
-    multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", edit_based_algorithms)
-    # multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more 'Token based' algorithms", token_based_algorithms)
-    # multiselect_sidebar_3 = st.sidebar.multiselect("Select one or more 'Sequence based' algorithms", text_algorithms)
-    # multiselect_sidebar_4 = st.sidebar.multiselect("Select one or more 'Compression based' algorithms", text_algorithms)
-    # multiselect_sidebar_5 = st.sidebar.multiselect("Select one or more 'Phonetic' algorithms", text_algorithms)
-    multiselect_algorithm_methods = list(map(edit_based_algorithms.get, multiselect_sidebar_1))
+    slider_button_2 = st.sidebar.slider("Select a Record Limit", min_value=1, max_value=100)
+    multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", dict_algorithms)
+    multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more algorithm methods", dict_algorithm_methods, default=["Normalized Similarity"])
 
-    if multiselect_sidebar_1 is not None:
-        st.write(multiselect_algorithm_methods)
+    st.sidebar.markdown("\n\n\n\n***")
+    with st.sidebar.expander("Resources"):
+        st.write("1. [TextDistance GitHub](https://github.com/life4/textdistance)")
+        st.write("2. [String similarity — the basic know your algorithms guide!](https://itnext.io/string-similarity-the-basic-know-your-algorithms-guide-3de3d7346227)")
+        st.write("3. [Guide to Fuzzy Matching with Python](http://theautomatic.net/2019/11/13/guide-to-fuzzy-matching-with-python/)")
 
-    col1, col2 = st.columns((1, 1))
+    multiselect_algorithms = list(map(dict_algorithms.get, multiselect_sidebar_1))
+    multiselect_algorith_methods = list(map(dict_algorithm_methods.get, multiselect_sidebar_2))
+    new_title = '<p style="font-family:sans-serif; color:Red; font-size: 60px;">TextDistance App</p>'
+    col1, col2, col3 = st.columns((2, 1, 1))
+
+    col1.markdown(new_title, unsafe_allow_html=True)
+    with col2.expander("About this App"):
+        st.subheader("Goal")
+        st.write("""The purpose of this app is to democratize the use of the [textdistance library](https://pypi.org/project/textdistance/). The script in the background
+        takes one or more datasets in an Excel or CSV format, processes the data based on user specifications in the sidebar and the fields chosen to measure.
+        The *find_similarities()* function found at the bottom of this app to get the source code.""")
+        st.subheader("Outcomes")
+        st.write("(A) Access to 30+ algorithms for comparing distance between two or more sequences.")
+        st.write("(B) A downloadable CSV of the Output")
+    with col3.expander("How to use this app"):
+        st.subheader("Files")
+        st.write("""(A) The files can be excel and/or csv.""")
+        st.write("""(B) If your data is not on the first row of the data, make sure to specify the starting row of the data in the expander below their respective file upload component""")
+        st.write("""(C) This app uses the first file as a *base*, to match against the selected field from the second file""")
+        st.subheader("Parameters")
+        st.write("(A) **Similarity Threshold**: this is the normalized similarity between")
+        st.write("(B) **Record Limit**: this is the normalized similarity between")
+        st.write("(C) **Algorithms**: [This is a list of availble algorithms and all methods](https://pypi.org/project/textdistance/)")
+
     if radio_button_1 == radio_options[0]:
+        col1, col2, col3, col4 = st.columns((5, 1.5, 2, 1.5))
+
+        xlsx_csv_radio = col1.radio("Select Excel or CSV", ['Excel', 'CSV'])
+        with col1.expander("Customize file #1 upload"):
+            header_file = st.number_input("Enter in starting row ", 0)
         file = col1.file_uploader(label='Select a file')
-        st.markdown("***")
         if file is not None and multiselect_sidebar_1 is not None:
-            df = pd.read_excel(file, engine='openpyxl')
-            col1, col2 = st.columns((1, 1))
-            option_1 = col1.selectbox("Select header from first file", convert_tuple(df.columns.values))
-            option_2 = col2.selectbox("Select item from second file", convert_tuple(df.columns.values))
 
-            df = find_similarities(df_1=df, df_2=df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=3, algo_list=multiselect_algorithm_methods)
-            st.write(f"With a Similarity Threshold of {slider_button_1} and a Maximum of {slider_button_2} matches per record in the first file")
-            st.write(df)
-        else:
-            col1.write("")
+            if xlsx_csv_radio == 'Excel':
+                one_file_df = pd.read_excel(file, skiprows=int(header_file), engine='openpyxl')
+            else:
+                pass
+            if xlsx_csv_radio == 'CSV':
+                one_file_df = pd.read_csv(file, encoding = 'latin-1', engine ='c')
+            else:
+                pass
+
+            col1, col2, col3, col4 = st.columns((1.5, 2, 1.5, 2))
+            option_1 = col1.selectbox("Select header from first file", convert_tuple(one_file_df.columns.values), key=222)
+            option_2 = col3.selectbox("Select header from second file", convert_tuple(one_file_df.columns.values))
+            col1, col2, col3 = st.columns((1, 1, 5))
+            if col1.button('Refresh Data'):
+                if multiselect_sidebar_1:
+                    with st.spinner(text='Hold on, trying to match your data...'):
+                        df = find_similarities(df_1=one_file_df, df_2=one_file_df, match_on=[option_1, option_2],
+                                               set_similarity_threshold=slider_button_1 / 100,
+                                               set_record_limit=slider_button_2, algo_list=multiselect_algorithms,
+                                               algo_method=multiselect_algorith_methods)
+
+                        col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
+                                             file_name='textdistance_streamlit_output.csv', mime='text/csv')
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        st.markdown(output_result, unsafe_allow_html=True)
+                        st.write(df)
+                    st.balloons()
+                else:
+                    st.error("Please select a textdistance algorithm from the sidebar!")
+
+        st.markdown("***")
+        with st.expander("View Source Code"):
+            st.code(textdistance_streamlit_code(), language='python')
     elif radio_button_1 == radio_options[1]:
+        col1, col2, col3, col4 = st.columns((2, 1.5, 2, 1.5))
 
-        file_1 = col1.file_uploader(label='Select a file')
-        file_2 = col2.file_uploader(label='Select another file')
+        xlsx_csv_radio_1 = col1.radio("Select Excel or CSV", ['Excel', 'CSV'])
+        with col2.expander("Customize file #1 upload"):
+            header_file_1 = st.number_input("Enter in starting row ", value=0)
+        file_1 = col1.file_uploader(label='Select a spreadsheet file')
+
+        xlsx_csv_radio_2 = col3.radio("Select Excel or CSV ", ['Excel', 'CSV'])
+        with col4.expander("Customize file #2 upload"):
+            header_file_2 = st.number_input("Enter in starting row  ",value=0)
+        file_2 = col3.file_uploader(label='Select a second spreadsheet')
+
 
         if file_1 is not None and file_2 is not None and multiselect_sidebar_1 is not None:
 
-            first_df = pd.read_excel(file_1, engine='openpyxl')
-            second_df = pd.read_excel(file_2, engine='openpyxl')
-            # option_1 = col1.multiselect("Multiselect", [*df_1.columns.values, *df_2.columns.values]
-            option_1 = col1.selectbox("Select header from first file", convert_tuple(first_df.columns.values))
-            option_2 = col2.selectbox("Select item from second file", convert_tuple(second_df.columns.values))
-            col1, col2 = st.columns((1, 1))
-            df = find_similarities(df_1=first_df, df_2=second_df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=3, algo_list=multiselect_algorithm_methods)
-            col1, col2 = st.columns((5, 2))
-            col1.write(f"With a Similarity Threshold of {slider_button_1} and a Maximum of {slider_button_2} matches per record in the first file")
+            if xlsx_csv_radio_1 == 'Excel':
+                first_df = pd.read_excel(file_1, skiprows=int(header_file_1), engine='openpyxl')
+            else:
+                pass
+            if xlsx_csv_radio_2 == 'Excel':
+                second_df = pd.read_excel(file_2, skiprows=int(header_file_2), engine='openpyxl')
+            else:
+                pass
 
+            if xlsx_csv_radio_1 == 'CSV':
+                first_df = pd.read_csv(file_1, encoding = 'latin-1', engine ='c')
+            else:
+                pass
+            if xlsx_csv_radio_2 == 'CSV':
+                second_df = pd.read_csv(file_2, encoding = 'latin-1', engine ='c')
+            else:
+                pass
 
-
-            st.write(df.head(1000))
-
-        else:
             st.markdown("***")
 
+            col1, col2, col3, col4 = st.columns((1.5, 2, 1.5, 2))
+            option_1 = col1.selectbox("Select header from first file", convert_tuple(first_df.columns.values), key=111)
+            option_2 = col3.selectbox("Select header from second file", convert_tuple(second_df.columns.values), key=110)
+            col1, col2, col3 = st.columns((1, 1, 5))
+            if col1.button('Refresh Data'):
+                if multiselect_sidebar_1:
 
-    # print(dir(st))
+                    with st.spinner(text='Hold on, trying to match your data...'):
+                        df = find_similarities(df_1=first_df, df_2=second_df, match_on=[option_1, option_2], set_similarity_threshold=slider_button_1/100, set_record_limit=slider_button_2, algo_list=multiselect_algorithms, algo_method=multiselect_algorith_methods)
 
+                        col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
+                                             file_name='textdistance_streamlit_output.csv', mime='text/csv')
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        st.markdown(output_result, unsafe_allow_html=True)
+                        st.write(df)
+                        st.markdown("***")
+                        with st.expander("View Source Code"):
+                            st.code(textdistance_streamlit_code(), language='python')
+                        st.balloons()
+                else:
+                    st.error("Please select a textdistance algorithm from the sidebar!")
+        else:
+            st.markdown("***")
+            with st.expander("View Source Code"):
+                st.code(textdistance_streamlit_code(), language='python')
 
 if __name__ == "__main__":
 
