@@ -60,7 +60,7 @@ def main():
 
 
 
-    slider_button_1 = st.sidebar.slider("Select a Similarity Threshold")
+    slider_button_1 = st.sidebar.slider("Select a Similarity Threshold minimum (0 - 1)")
     slider_button_2 = st.sidebar.slider("Select a Record Limit", min_value=1, max_value=100)
     multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", dict_algorithms)
     multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more algorithm methods", dict_algorithm_methods, default=["Normalized Similarity"])
@@ -79,20 +79,30 @@ def main():
     col1.markdown(new_title, unsafe_allow_html=True)
     with col2.expander("About this App"):
         st.subheader("Goal")
-        st.write("""The purpose of this app is to democratize the use of the [textdistance library](https://pypi.org/project/textdistance/). The script in the background
-        takes one or more datasets in an Excel or CSV format, processes the data based on user specifications in the sidebar and the fields chosen to measure.
-        The *find_similarities()* function found at the bottom of this app to get the source code.""")
+        st.write("""The purpose of this app is to democratize the use of the 
+        [textdistance library](https://pypi.org/project/textdistance/). The script in the background
+        takes one or more datasets in an Excel or CSV format, processes the data based on user specifications in the 
+        sidebar and the fields chosen to measure below the file upload components. The *find_similarities()* function at
+         the bottom of this app is the logic that this app uses to compare 2 fields. """)
         st.subheader("Outcomes")
         st.write("(A) Access to 30+ algorithms for comparing distance between two or more sequences.")
-        st.write("(B) A downloadable CSV of the Output")
+        st.write("(B) A downloadable CSV of the Output with all of the desired algorithms and algorithm methods from "
+                 "the sidebar")
     with col3.expander("How to use this app"):
-        st.subheader("Files")
+        st.subheader("Data")
         st.write("""(A) The files can be excel and/or csv.""")
         st.write("""(B) If your data is not on the first row of the data, make sure to specify the starting row of the data in the expander below their respective file upload component""")
-        st.write("""(C) This app uses the first file as a *base*, to match against the selected field from the second file""")
+        st.write("""(C) This app uses the first file, algorithm, and algorithm method from the inputs as the values
+        being search and sorted by in the output. For example, if the first inputs from the sidebar are Levenshtein and Normalized Similarity,
+        the record limit and similarity threshold would be based on the top matches from the Levenshtein Normalized similarity.""")
         st.subheader("Parameters")
-        st.write("(A) **Similarity Threshold**: this is the normalized similarity between")
-        st.write("(B) **Record Limit**: this is the normalized similarity between")
+        st.write("""(A) **Algorithm Method  Threshold**: """)
+        st.write("* Distance: calculate distance between sequences.")
+        st.write("* Similarity: calculate similarity for sequences.")
+        st.write("* Maximum: maximum possible value for distance and similarity. For any sequence: distance + similarity == maximum.")
+        st.write("* Normalized Distance: normalized distance between sequences. The return value is a float between 0 and 1, where 0 means equal, and 1 totally different.")
+        st.write("* Normalized Similarity: normalized similarity for sequences. The return value is a float between 0 and 1, where 0 means totally different, and 1 equal.")
+
         st.write("(C) **Algorithms**: [This is a list of availble algorithms and all methods](https://pypi.org/project/textdistance/)")
 
     if radio_button_1 == radio_options[0]:
@@ -127,7 +137,7 @@ def main():
 
                         col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
                                              file_name='textdistance_streamlit_output.csv', mime='text/csv')
-                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2} | Length of New Dataset {df.shape[0]}</p>'
                         st.markdown(output_result, unsafe_allow_html=True)
                         st.write(df)
                     st.balloons()
@@ -185,7 +195,7 @@ def main():
 
                         col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
                                              file_name='textdistance_streamlit_output.csv', mime='text/csv')
-                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2} | Length of New Dataset {df.shape[0]}</p>'
                         st.markdown(output_result, unsafe_allow_html=True)
                         st.write(df)
                         st.markdown("***")
