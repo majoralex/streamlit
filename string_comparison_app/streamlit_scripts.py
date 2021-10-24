@@ -23,20 +23,19 @@ def find_similarities(df_1: pd.DataFrame, df_2: pd.DataFrame, match_on: list,
     """
 
     similarity_df = []
-    final_df = pd.DataFrame
     for df_2_index, df_2_row in df_2.iterrows():
         for df_1_index, df_1_row in df_1.iterrows():
-            # first_algo = eval(
-            #     f"textdistance.{algo_list[0]}.normalized_similarity(df_2_row[match_on[1]], df_1_row[match_on[0]])")
+            first_algo = eval(
+                f"textdistance.{algo_list[0]}.{algo_method[0]}(df_2_row[match_on[1]], df_1_row[match_on[0]])")
             similarity_df.append({
                 f'{match_on[0]}_index': df_1_index,
                 f'{match_on[1]}_index': df_2_index,
                 match_on[0]: df_1_row[match_on[0]],
                 match_on[1]: df_2_row[match_on[1]],
-                f'{algo_list[0]}_score': 3,
+                f'{algo_list[0]}_{algo_method[0]}': first_algo,
             })
 
-    final_df = pd.DataFrame(similarity_df).sort_values(by=[f'{match_on[0]}_index', f'{algo_list[0]}_score'],
+    final_df = pd.DataFrame(similarity_df).sort_values(by=[f'{match_on[0]}_index', f'{algo_list[0]}_{algo_method[0]}'],
                                                        ascending=[True, False]).drop_duplicates()
 
     for index, row in final_df.iterrows():
@@ -47,7 +46,7 @@ def find_similarities(df_1: pd.DataFrame, df_2: pd.DataFrame, match_on: list,
                 # print(f'{algo_list[algo_index]}_score', algo, "Output -> ", algo_output)
                 final_df.at[index, f'{algo}_{algo_method_item}'] = algo_output
 
-    final_df = final_df[final_df[f'{algo_list[0]}_score'].astype(float) >= set_similarity_threshold]
+    final_df = final_df[final_df[f'{algo_list[0]}_{algo_method[0]}'].astype(float) >= set_similarity_threshold]
     grouped_df = final_df.groupby(f'{match_on[0]}_index')
     final_df_record_limit = grouped_df.head(set_record_limit)
 
@@ -81,10 +80,10 @@ def textdistance_streamlit_code():
                                 match_on[0]: df_1_row[match_on[0]],
                                 match_on[1]: df_2_row[match_on[1]],
                                 'levenstethin_test': textdistance.levenshtein.normalized_similarity(df_2_row[match_on[1]], df_1_row[match_on[0]]),
-                                f'{algo_list[0]}_score': first_algo,
+                                f'{algo_list[0]}_{algo_method[0]}': first_algo,
                             })
                 
-                    final_df = pd.DataFrame(similarity_df).sort_values(by=[f'{match_on[0]}_index', f'{algo_list[0]}_score'], ascending=[True, False]).drop_duplicates()
+                    final_df = pd.DataFrame(similarity_df).sort_values(by=[f'{match_on[0]}_index', f'{algo_list[0]}_{algo_method[0]}'], ascending=[True, False]).drop_duplicates()
                 
                     for index, row in final_df.iterrows():
                         for algo_index, algo in enumerate(algo_list):
@@ -93,7 +92,7 @@ def textdistance_streamlit_code():
                             print(f'{algo_list[algo_index]}_score', algo, "Output -> ", algo_output)
                             final_df.at[index, f'{algo}_score'] = algo_output
                 
-                    final_df = final_df[final_df[f'{algo_list[0]}_score'].astype(float) >= set_similarity_threshold]
+                    final_df = final_df[final_df[f'{algo_list[0]}_{algo_method[0]}'].astype(float) >= set_similarity_threshold]
                     grouped_df = final_df.groupby(f'{match_on[0]}_index')
                     final_df_record_limit = grouped_df.head(set_record_limit)
                     return final_df_record_limit
