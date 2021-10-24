@@ -60,7 +60,7 @@ def main():
 
 
 
-    slider_button_1 = st.sidebar.slider("Select a Similarity Threshold")
+    slider_button_1 = st.sidebar.slider("Select a Similarity Threshold minimum")
     slider_button_2 = st.sidebar.slider("Select a Record Limit", min_value=1, max_value=100)
     multiselect_sidebar_1 = st.sidebar.multiselect("Select one or more algorithms", dict_algorithms)
     multiselect_sidebar_2 = st.sidebar.multiselect("Select one or more algorithm methods", dict_algorithm_methods, default=["Normalized Similarity"])
@@ -81,7 +81,7 @@ def main():
         st.subheader("Goal")
         st.write("""The purpose of this app is to democratize the use of the [textdistance library](https://pypi.org/project/textdistance/). The script in the background
         takes one or more datasets in an Excel or CSV format, processes the data based on user specifications in the sidebar and the fields chosen to measure.
-        The *find_similarities()* function found at the bottom of this app to get the source code.""")
+        The *find_similarities()* function at the bottom of this app is the logic that this app uses to compare 2 fields. """)
         st.subheader("Outcomes")
         st.write("(A) Access to 30+ algorithms for comparing distance between two or more sequences.")
         st.write("(B) A downloadable CSV of the Output")
@@ -89,7 +89,10 @@ def main():
         st.subheader("Files")
         st.write("""(A) The files can be excel and/or csv.""")
         st.write("""(B) If your data is not on the first row of the data, make sure to specify the starting row of the data in the expander below their respective file upload component""")
-        st.write("""(C) This app uses the first file as a *base*, to match against the selected field from the second file""")
+        st.write("""(C) This app uses the first file, first algorithm, and first algorithm method from the inputs as the values
+        being search and sorted by in the output. For example, if the first inputs from the sidebar are Levenshtein and Normalized Similarity,
+        the record limit and similarity threshold would be based on the top matches from the Levenshtein Normalized similarity.
+        w to sort the subsequent data. Meaning, the column header select in the first column will be used as the row to search all other rows,  to match against the selected field from the second file""")
         st.subheader("Parameters")
         st.write("(A) **Similarity Threshold**: this is the normalized similarity between")
         st.write("(B) **Record Limit**: this is the normalized similarity between")
@@ -127,7 +130,7 @@ def main():
 
                         col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
                                              file_name='textdistance_streamlit_output.csv', mime='text/csv')
-                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2} | Length of New Dataset {df.shape[0]}</p>'
                         st.markdown(output_result, unsafe_allow_html=True)
                         st.write(df)
                     st.balloons()
@@ -185,7 +188,7 @@ def main():
 
                         col2.download_button(label="Download Data", data=df.to_csv().encode('utf-8'),
                                              file_name='textdistance_streamlit_output.csv', mime='text/csv')
-                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2}</p>'
+                        output_result = f'<p style="font-family:sans-serif; color:Red; font-size: 16px;">Similarity Threshold of {slider_button_1} | Record limit of {slider_button_2} | Length of New Dataset {df.shape[0]}</p>'
                         st.markdown(output_result, unsafe_allow_html=True)
                         st.write(df)
                         st.markdown("***")

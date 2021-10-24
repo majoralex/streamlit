@@ -23,16 +23,17 @@ def find_similarities(df_1: pd.DataFrame, df_2: pd.DataFrame, match_on: list,
     """
 
     similarity_df = []
+    final_df = pd.DataFrame
     for df_2_index, df_2_row in df_2.iterrows():
         for df_1_index, df_1_row in df_1.iterrows():
-            first_algo = eval(
-                f"textdistance.{algo_list[0]}.normalized_similarity(df_2_row[match_on[1]], df_1_row[match_on[0]])")
+            # first_algo = eval(
+            #     f"textdistance.{algo_list[0]}.normalized_similarity(df_2_row[match_on[1]], df_1_row[match_on[0]])")
             similarity_df.append({
                 f'{match_on[0]}_index': df_1_index,
                 f'{match_on[1]}_index': df_2_index,
                 match_on[0]: df_1_row[match_on[0]],
                 match_on[1]: df_2_row[match_on[1]],
-                f'{algo_list[0]}_score': first_algo,
+                f'{algo_list[0]}_score': 3,
             })
 
     final_df = pd.DataFrame(similarity_df).sort_values(by=[f'{match_on[0]}_index', f'{algo_list[0]}_score'],
@@ -43,7 +44,7 @@ def find_similarities(df_1: pd.DataFrame, df_2: pd.DataFrame, match_on: list,
             for algo_method_index, algo_method_item in enumerate(algo_method):
                 algo_output = eval(
                     f"textdistance.{algo_list[algo_index]}.{algo_method[algo_method_index]}(final_df[match_on[0]][{index}], final_df[match_on[1]][{index}])")
-                print(f'{algo_list[algo_index]}_score', algo, "Output -> ", algo_output)
+                # print(f'{algo_list[algo_index]}_score', algo, "Output -> ", algo_output)
                 final_df.at[index, f'{algo}_{algo_method_item}'] = algo_output
 
     final_df = final_df[final_df[f'{algo_list[0]}_score'].astype(float) >= set_similarity_threshold]
