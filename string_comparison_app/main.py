@@ -151,12 +151,12 @@ def main():
         col1, col2, col3, col4 = st.columns((2, 1.5, 2, 1.5))
 
         xlsx_csv_radio_1 = col1.radio("Select Excel or CSV", ['Excel', 'CSV'])
-        with col2.expander("Customize file #1 upload"):
+        with col1.expander("Customize file #1 upload"):
             header_file_1 = st.number_input("Enter in starting row ", value=0)
         file_1 = col1.file_uploader(label='Select a spreadsheet file')
 
         xlsx_csv_radio_2 = col3.radio("Select Excel or CSV ", ['Excel', 'CSV'])
-        with col4.expander("Customize file #2 upload"):
+        with col3.expander("Customize file #2 upload"):
             header_file_2 = st.number_input("Enter in starting row  ",value=0)
         file_2 = col3.file_uploader(label='Select a second spreadsheet')
 
