@@ -1,7 +1,6 @@
 """"
 
  """
-from turtle import width
 import streamlit as st
 import pandas as pd
 from wordcloud import WordCloud, STOPWORDS
