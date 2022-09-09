@@ -16,6 +16,7 @@ import plotly.graph_objects as go
 # import nltk; nltk.download('popular')
 # nltk.download('omw-1.4')
 nltk.download('stopwords')
+nltk.download('wordnet')
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 200)
