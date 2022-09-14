@@ -139,7 +139,9 @@ def main():
             col1, col2 = st.columns((2,5))
             
 
-            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=range(0,n_gram_size),  value=[0, max(n_gram_df['count'])])
+            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=[n for n in range(0,n_gram_size)],  value=[0, max(n_gram_df['count'])])
+            
+            
             if n_gram_count_slider_options:
                 n_gram_df = n_gram_df.loc[(n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1])]
             
