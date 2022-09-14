@@ -11,12 +11,7 @@ import unicodedata
 import nltk
 from tqdm import tqdm
 
-import plotly.graph_objects as go
-
-# import nltk; nltk.download('popular')
-nltk.download('omw-1.4')
 nltk.download('stopwords')
-nltk.download('wordnet')
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 200)
@@ -102,39 +97,99 @@ def main():
      page_icon="🧊",
      layout="wide",
      initial_sidebar_state="expanded",
-     menu_items={
-         'Get Help': 'https://www.extremelycoolapp.com/help',
-         'Report a bug': "https://www.extremelycoolapp.com/bug",
-         'About': "# This is a header. This is an *extremely* cool app!"
-     }
+    #  menu_items={
+    #      'Get Help': 'https://www.extremelycoolapp.com/help',
+    #      'Report a bug': "https://www.extremelycoolapp.com/bug",
+    #      'About': "# This is a header. This is an *extremely* cool app!"
+    #  }
     )
 
-    st.write("# WordCloud and N-Grams")
+
+
 
     with st.sidebar:
-        refresh_button = st.button("Refresh Data")
+        st.title("Controls and Filters")
         n_gram_size = st.slider("Number of Words in N-Gram", 1, 10, 3)
         file = st.file_uploader("Add a CSV ...")
-    if file:
-        n_gram_df = pd.read_csv(file)
+        if file:
+            df = pd.read_csv(file)
+            st.subheader("Filter Original Dataset")
+            column_to_ngram_options = st.selectbox("Select a Column to turn into a series of n-grams", options=df.columns)
 
-        column_ngram_options = st.selectbox("Select a Column to turn into a series of n-grams", options=n_gram_df.columns)
-        n_gram_df = make_ngram(df=n_gram_df, corpus_text_col=column_ngram_options, word_combo=n_gram_size).rename(columns={'index': 'n_grams', 0: 'count'}, inplace=False).sort_values(by=['count'], ascending=False)
-        # n_gram_df['n_gram_merged'] = ["; ".join(x) for x in n_gram_df.iloc[:, 0]]
+
+
+    if file is not None and column_to_ngram_options is not None:
+        with st.spinner('Wait for it...'):
+            n_gram_df = make_ngram(df=df, corpus_text_col=column_to_ngram_options, word_combo=n_gram_size).rename(columns={'index': 'n_grams', 0: 'count'}, inplace=False).sort_values(by=['count'], ascending=False)
+            n_gram_df['n_gram_string'] = [', '.join(map(str, l)) for l in n_gram_df['n_grams']]
+
+            st.write("# WordCloud and N-Grams")
+            col1, col2, col3, col4= st.columns((2,2,2,2))
+            col1.metric("Number of Rows from File", value=df.shape[0])
+            col2.metric("Number of n-grams created", value=n_gram_df.shape[0])
+            col3.metric("Avg. Count of N-Grams", value=n_gram_df['count'].mean().round(2))
+            col4.metric("Max. Count of N-Grams", value=n_gram_df['count'].max().round(2))
+
+
+            col1, col2, col3 = st.columns((2,1.2,6))
+
+            col1.subheader("Filter by N-Gram")
+            col2.download_button("Download", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")
+            
+
+            n_gram_options = col3.multiselect("Select one or more N-grams", 
+            options=n_gram_df['n_gram_string'])
+
+
+
+
+            col1, col2 = st.columns((2,5))
+            
+            # flat_list = list()  
+            # for sub_list in n_gram_df['n_grams']:
+            #     flat_list += sub_list
+            # wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
+            # col2.image(wc.to_array(), use_column_width=True)
+
+            # col1, col2, col3 = st.columns((2,2,4))
+
+            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=range(0,n_gram_size))
+
+
+                
+            
+
         
-        flat_list = list()  
-        for sub_list in n_gram_df['n_grams']:
-            flat_list += sub_list
+            col1, col2 = st.columns((2,6))
+            with col1:
 
-        wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
-        col1, col2 = st.columns((2,6))
-        with col1:
-            st._legacy_dataframe(n_gram_df, width=500, height=1000)
+                if n_gram_options:
+                    n_gram_df = n_gram_df.loc[n_gram_df.n_gram_string.isin(n_gram_options)]
 
-        with col2:
-            st.image(wc.to_array(), use_column_width=True)
+                if n_gram_count_slider_options:
+                    n_gram_df = n_gram_df.loc[n_gram_df['count'] >= n_gram_count_slider_options]
+
+
+                n_gram_df = n_gram_df.drop('n_gram_string', axis=1)
+
+
+                st._legacy_dataframe(n_gram_df, width=800, height=1000)
+
+            with col2:
+                flat_list = list()  
+                for sub_list in n_gram_df['n_grams']:
+                        flat_list += sub_list
+                wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
+                st.image(wc.to_array(), use_column_width=True)
+
+
+
+
+
     else: 
         st.subheader("Upload a file to begin!")
+        st.success("Please add a CSV file in the Sidebar with text to get started...")
+
 
 
     
