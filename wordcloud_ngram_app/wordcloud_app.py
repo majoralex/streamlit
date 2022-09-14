@@ -89,7 +89,6 @@ def make_aagrid_table(df: pd.DataFrame):
     return AgGrid(df)
 
 
-
 def main():
 
     st.set_page_config(
@@ -103,8 +102,6 @@ def main():
     #      'About': "# This is a header. This is an *extremely* cool app!"
     #  }
     )
-
-
 
 
     with st.sidebar:
@@ -130,7 +127,6 @@ def main():
             col3.metric("Avg. Count of N-Grams", value=n_gram_df['count'].mean().round(2))
             col4.metric("Max. Count of N-Grams", value=n_gram_df['count'].max().round(2))
 
-
             col1, col2, col3 = st.columns((2,1.2,6))
 
             col1.subheader("Filter by N-Gram")
@@ -140,23 +136,13 @@ def main():
             n_gram_options = col3.multiselect("Select one or more N-grams", 
             options=n_gram_df['n_gram_string'])
 
-
-
-
             col1, col2 = st.columns((2,5))
             
-            # flat_list = list()  
-            # for sub_list in n_gram_df['n_grams']:
-            #     flat_list += sub_list
-            # wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
-            # col2.image(wc.to_array(), use_column_width=True)
 
-            # col1, col2, col3 = st.columns((2,2,4))
-
-            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=range(0,n_gram_size))
-
-
-                
+            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=range(0,n_gram_size),  value=[0, max(n_gram_df['count'])])
+            st.write(n_gram_count_slider_options)
+            if n_gram_count_slider_options:
+                n_gram_df = n_gram_df.loc[(n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1])]
             
 
         
@@ -165,10 +151,6 @@ def main():
 
                 if n_gram_options:
                     n_gram_df = n_gram_df.loc[n_gram_df.n_gram_string.isin(n_gram_options)]
-
-                if n_gram_count_slider_options:
-                    n_gram_df = n_gram_df.loc[n_gram_df['count'] >= n_gram_count_slider_options]
-
 
                 n_gram_df = n_gram_df.drop('n_gram_string', axis=1)
 
@@ -181,10 +163,6 @@ def main():
                         flat_list += sub_list
                 wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
                 st.image(wc.to_array(), use_column_width=True)
-
-
-
-
 
     else: 
         st.subheader("Upload a file to begin!")
