@@ -157,15 +157,45 @@ def main():
                 st._legacy_dataframe(n_gram_df, width=800, height=1000)
 
             with col2:
-                flat_list = list()  
-                for sub_list in n_gram_df['n_grams']:
-                        flat_list += sub_list
-                wc = make_wordcloud(df=pd.DataFrame({'data': flat_list}), corpus_text='data')
+                # flat_list = list()  
+                # for sub_list in df[column_to_ngram_options]:
+
+                #         flat_list += sub_list
+                df_cleaned = ['' if pd.isnull(row) else row.lower()for row in df[column_to_ngram_options]].copy()
+                
+
+                if n_gram_options:
+                    # st.write(df[column_to_ngram_options])
+
+                    n_gram_list = []
+
+                    def more_functional_append(data, x):
+                        data=[]
+                        data.append(x)
+                        return data
+
+
+                    # final_list = more_functional_append(self=[], x=n_gram_options)
+
+                    # x = [n_gram_list.append(n.split()) for i_n, n in enumerate(n_gram_options)]
+                    # st.write(x)
+                        # st.write(n.split())
+                    f_list = []
+                    for n in n_gram_options:
+                        wc_df = df.loc[df[column_to_ngram_options].isin(n.split())]
+
+                        f_list.extend(n.split())
+                    st.write(f_list)
+
+                    # st.write(n_gram_options[0].split(", "))
+                    # wc_df = df.loc[df[column_to_ngram_options].isin(n_gram_options)]
+                wc = make_wordcloud(df=pd.DataFrame({'data': df_cleaned}), corpus_text='data')
                 st.image(wc.to_array(), use_column_width=True)
+                
 
     else: 
         st.subheader("Upload a file to begin!")
-        st.success("Please add a CSV file in the Sidebar with text to get started...")
+        st.success("Please add a CSV file in the Sidebar to get started...")
 
 
 
