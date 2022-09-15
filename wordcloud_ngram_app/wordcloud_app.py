@@ -92,8 +92,8 @@ def make_aagrid_table(df: pd.DataFrame):
 def main():
 
     st.set_page_config(
-     page_title="WorldCloud | N-GRAM",
-     page_icon="🧊",
+     page_title="WorldCloud | n-gram Generator",
+     page_icon="⛅",
      layout="wide",
      initial_sidebar_state="expanded",
     #  menu_items={
@@ -103,7 +103,7 @@ def main():
     #  }
     )
 
-
+    st.title("⛅ WordCloud | ⛓️ n-gram Generator")
     with st.sidebar:
         st.title("Controls and Filters")
         n_gram_size = st.slider("Number of Words in N-Gram", 1, 10, 3)
@@ -120,38 +120,60 @@ def main():
             n_gram_df = make_ngram(df=df, corpus_text_col=column_to_ngram_options, word_combo=n_gram_size).rename(columns={'index': 'n_grams', 0: 'count'}, inplace=False).sort_values(by=['count'], ascending=False)
             n_gram_df['n_gram_string'] = [', '.join(map(str, l)) for l in n_gram_df['n_grams']]
 
-            st.write("# WordCloud and N-Grams")
+
             col1, col2, col3, col4= st.columns((2,2,2,2))
             col1.metric("Number of Rows from File", value=df.shape[0])
             col2.metric("Number of n-grams created", value=n_gram_df.shape[0])
             col3.metric("Avg. Count of N-Grams", value=n_gram_df['count'].mean().round(2))
             col4.metric("Max. Count of N-Grams", value=n_gram_df['count'].max().round(2))
 
-            col1, col2, col3 = st.columns((2,1.2,6))
+            # col1, col2, col3 = st.columns((2,1.2,6))
 
-            col1.subheader("Filter by N-Gram")
-            col2.download_button("Download", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")
+            # col1.subheader("Filter by N-Gram")
+            # col2.download_button("Download", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")
             
 
-            n_gram_options = col3.multiselect("Select one or more N-grams", 
-            options=n_gram_df['n_gram_string'])
 
-            col1, col2 = st.columns((2,5))
-            
+            # col1, col2 = st.columns((2,5))
+            # col1, col2 = st.columns((2,6))
 
-            n_gram_count_slider_options = col1.select_slider("Select the Count Range", options=[n for n in range(0,n_gram_size)],  value=[0, max(n_gram_df['count'])])
+            max_ngram_count = n_gram_df['count'].max()
+            n_gram_count_range = [n+1 for n in range(0,max_ngram_count)]
             
+            df_cleaned = ['' if pd.isnull(row) else row.lower()for row in df[column_to_ngram_options]].copy()
+            # wc = make_wordcloud(df=pd.DataFrame({'data': df_cleaned}), corpus_text='data')
+        
+
+            col1, col2, col3= st.columns((2,2,10))
+
+            col1.download_button("Download n-gram Table", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")         
+
+            n_gram_count_slider_options = st.slider("Select the Count Range", min_value=1, max_value=int(max_ngram_count), value=(1, int(max_ngram_count)))
             
             if n_gram_count_slider_options:
                 n_gram_df = n_gram_df.loc[(n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1])]
             
+
+            n_gram_options = st.multiselect("Select one or more N-grams", 
+            options=n_gram_df['n_gram_string'][:50000]) #ToDo: consider changing 
 
         
             col1, col2 = st.columns((2,6))
             with col1:
 
                 if n_gram_options:
-                    n_gram_df = n_gram_df.loc[n_gram_df.n_gram_string.isin(n_gram_options)]
+                    n_gram_set_list = [n.split(", ") for n in n_gram_options]
+                    n_gram_filtered_df_cleaned = []
+
+                    for index, item in enumerate(df_cleaned): #ToDo do better
+                        for gram in n_gram_set_list:
+                            if all(n in item for n in gram):
+                                n_gram_filtered_df_cleaned.append(item)
+                        # wc = make_wordcloud(df=pd.DataFrame({'data': n_gram_filtered_df_cleaned}), corpus_text='data')
+                        df_cleaned = n_gram_df.loc[n_gram_df['n_gram_string'].isin(n_gram_options)].copy()
+                # else:
+                #     wc = make_wordcloud(df=pd.DataFrame({'data': df_cleaned}), corpus_text='data')
+
 
                 n_gram_df = n_gram_df.drop('n_gram_string', axis=1)
 
@@ -159,39 +181,9 @@ def main():
                 st._legacy_dataframe(n_gram_df, width=800, height=1000)
 
             with col2:
-                # flat_list = list()  
-                # for sub_list in df[column_to_ngram_options]:
 
-                #         flat_list += sub_list
-                df_cleaned = ['' if pd.isnull(row) else row.lower()for row in df[column_to_ngram_options]].copy()
-                
-
-                if n_gram_options:
-                    # st.write(df[column_to_ngram_options])
-
-                    n_gram_list = []
-
-                    def more_functional_append(data, x):
-                        data=[]
-                        data.append(x)
-                        return data
-
-
-                    # final_list = more_functional_append(self=[], x=n_gram_options)
-
-                    # x = [n_gram_list.append(n.split()) for i_n, n in enumerate(n_gram_options)]
-                    # st.write(x)
-                        # st.write(n.split())
-                    f_list = []
-                    for n in n_gram_options:
-                        wc_df = df.loc[df[column_to_ngram_options].isin(n.split())]
-
-                        f_list.extend(n.split())
-                    st.write(f_list)
-
-                    # st.write(n_gram_options[0].split(", "))
-                    # wc_df = df.loc[df[column_to_ngram_options].isin(n_gram_options)]
                 wc = make_wordcloud(df=pd.DataFrame({'data': df_cleaned}), corpus_text='data')
+     
                 st.image(wc.to_array(), use_column_width=True)
                 
 
