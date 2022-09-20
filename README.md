@@ -7,7 +7,11 @@
 
 #### Purpose & Goal
 
+#### Outcome
+
+
 ## WordCloud App
 
 #### Purpose & Goal
 
+#### Outcome
