@@ -129,11 +129,11 @@ def main():
                 
                 # SCORE CARDS & METRICS
                 
-                # col1, col2, col3, col4= st.columns((2,2,2,2))
-                # col1.metric("Number of Rows from File", value=f"{df.shape[0]:,}")
-                # col2.metric("Number of n-grams created", value=f"{n_gram_df.shape[0]:,}")
-                # col3.metric("Avg. Count of N-Grams", value=n_gram_df['count'].mean().round(2))
-                # col4.metric("Max. Count of N-Grams", value=f"{n_gram_df['count'].max().round(2):,}")
+                col1, col2, col3, col4= st.columns((2,2,2,2))
+                col1.metric("Number of Rows from File", value=f"{df.shape[0]:,}")
+                col2.metric("Number of n-grams created", value=f"{n_gram_df.shape[0]:,}")
+                col3.metric("Avg. Count of N-Grams", value=n_gram_df['count'].mean().round(2))
+                col4.metric("Max. Count of N-Grams", value=f"{n_gram_df['count'].max().round(2):,}")
 
                 max_ngram_count = n_gram_df['count'].max()
 
