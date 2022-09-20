@@ -175,6 +175,8 @@ def main():
             st.success("Please add a **CSV file** in the Sidebar to get started...", icon="🚦")
     except AttributeError:
         st.error('Looks like the column selected in the sidebar is being read as a Number or the data is not in the **First Row** of the file. \n\n     Try selecting a different column in the sidebar or re-formatting your file.', icon="🚨")
+    except ValueError:
+        st.error('Looks like there is no data from the filters. \n\n     Try selecting adjusting the slider or the selectbox to show results.', icon="🚨")
 
 
 
