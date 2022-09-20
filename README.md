@@ -11,6 +11,7 @@
 
 
 ## WordCloud App
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_bade_black_white.svg)](https://majoralex-streamlit-wordcloud-ngram-appwordcloud-app-leulmv.streamlitapp.com/)
 
 #### Purpose & Goal
 
