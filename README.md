@@ -10,8 +10,7 @@
 #### Outcome
 
 
-## WordCloud App
-## Signal Processing Tutorial [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://github.com/majoralex/streamlit/blob/main/wordcloud_ngram_app/wordcloud_app.py)
+## WordCloud App [![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg](https://github.com/majoralex/streamlit/blob/main/wordcloud_ngram_app/wordcloud_app.py)
 
 #### Purpose & Goal
 
