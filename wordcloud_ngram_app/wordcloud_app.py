@@ -152,9 +152,7 @@ def main():
                     n_gram_df = n_gram_df.loc[(n_gram_df['n_gram_string'].isin(n_gram_options)) | ((n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1]))]
                     # st.write(n_gram_df['n_grams'])                
                     for contains in n_gram_df['n_grams']:
-                        pass
                         wc_data = [ f for f in corpus_text_list if all(c in f for c in contains) ]
-                        # st.write(wc_data)
                     wc = make_wordcloud(wc_data)
                 else:
                     wc = make_wordcloud(corpus_text_list)
@@ -167,7 +165,7 @@ def main():
                     st._legacy_dataframe(n_gram_df, width=800, height=1000) # there is a bug with normal method, which truncates the table
 
                 with col2:
-                    # st.empty()
+      
                     st.image(wc.to_array(), use_column_width=True)
                     
         else: 
