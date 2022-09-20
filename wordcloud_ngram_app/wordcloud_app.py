@@ -114,8 +114,9 @@ def main():
             column_to_ngram_options = st.selectbox("Select a Column to turn into a series of n-grams", options=df.columns)
 
 
-            st.write("🔍 [What is an n-gram?](https://en.wikipedia.org/wiki/N-gram)")
-            st.write("🔍 [What is an n-gram?](https://en.wikipedia.org/wiki/N-gram)")
+        st.write("🔍 [What is an n-gram?](https://en.wikipedia.org/wiki/N-gram)")
+        st.write("📂  [GitHub repo](https://github.com/majoralex/streamlit/)")
+        st.write("👨‍💻 [The Code](https://github.com/majoralex/streamlit/tree/main/wordcloud_ngram_app)")
 
 
 
