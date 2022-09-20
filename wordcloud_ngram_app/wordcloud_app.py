@@ -142,30 +142,32 @@ def main():
                 # st.write(corpus_text_list)
                 col1, col2, col3= st.columns((2,2,10))
 
-                col1.download_button("Download n-gram Table", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")         
+                col1.download_button("Download n-gram Table", data=n_gram_df.to_csv().encode('utf-8'), file_name=f"n_grams_data_size-{n_gram_size}.csv")
+
                 n_gram_options = st.multiselect("Select one or more n-grams (Showing top 50k n-grams)", options=n_gram_multiselect_options(n_gram_df))
-                n_gram_count_slider_options = st.slider("Select the Count Range", min_value=1, max_value=int(max_ngram_count), value=(1, int(max_ngram_count)))
+                n_gram_count_slider_options = st.slider("Select the Count Range (Default showing top 70%)", min_value=1, max_value=int(max_ngram_count), value=((int(max_ngram_count*0.7)) if int(max_ngram_count*0.7) > 1 else 1, int(max_ngram_count)))
                 
-                
-                # Just doing a fiilter if either of the two data controls have options selected
-                if n_gram_options or n_gram_count_slider_options:
-                    n_gram_df = n_gram_df.loc[(n_gram_df['n_gram_string'].isin(n_gram_options)) | ((n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1]))]
-                    # st.write(n_gram_df['n_grams'])                
-                    for contains in n_gram_df['n_grams']:
-                        wc_data = [ f for f in corpus_text_list if all(c in f for c in contains) ]
-                    wc = make_wordcloud(wc_data)
-                else:
-                    wc = make_wordcloud(corpus_text_list)
+
+                if n_gram_options:
+                    n_gram_df = n_gram_df.loc[(n_gram_df['n_gram_string'].isin(n_gram_options))]
+
+                if n_gram_count_slider_options:
+                    n_gram_df = n_gram_df.loc[((n_gram_df['count'] >= n_gram_count_slider_options[0]) & (n_gram_df['count'] <= n_gram_count_slider_options[1]))]
+                filtered_data = []
+                for n in n_gram_df['n_grams']:
+                    filtered_text = [f for f in corpus_text_list if all(c in f for c in n)]
+                    # st.write(text)
+                    filtered_data.append(filtered_text)
+
+                wc = make_wordcloud(filtered_data)
 
                 col1, col2 = st.columns((2,6))
                 with col1:
-                    if n_gram_options:
-                        n_gram_df = n_gram_df.loc[n_gram_df['n_gram_string'].isin(n_gram_options)]
-                    n_gram_df = n_gram_df.drop('n_gram_string', axis=1)
+
                     st._legacy_dataframe(n_gram_df, width=800, height=1000) # there is a bug with normal method, which truncates the table
 
                 with col2:
-      
+                    # st.empty()
                     st.image(wc.to_array(), use_column_width=True)
                     
         else: 
