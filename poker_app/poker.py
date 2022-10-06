@@ -18,9 +18,7 @@ def draw_deck():
 
 
 def get_board_values(board):
-    cards = draw_deck()
-    # st.write(cards)
-    return [c[0] for c in cards if c[1] in board]
+    return [c[0] for c in draw_deck() if c[1] in board]
 
 
 def clean_deck(cards):
@@ -38,7 +36,7 @@ def open_image(card_string):
         return Image.open(os.getcwd() + f"\\poker_app\\cards\\{clean_deck(card_string)}.png")
     except FileNotFoundError:
         return Image.open(os.getcwd() + f"\\poker_app\\cards\\default.jpg")
-    return 
+    
 
 def main():
 
@@ -93,8 +91,6 @@ def main():
     if flop3:
         col3.image(open_image(card_string=flop3))
 
-
-
     turn = col4.selectbox("Card #4", options=card_labels, key="card_4")
 
     if turn:
@@ -108,16 +104,21 @@ def main():
     if len(board) < 5:
         st.error("Looks you've picked a duplicate card!")
     st.markdown("***")
-
+    
+    hand = [playercard1, playercard2]
     board_values = get_board_values(board)
+
+    duplicates = [item for item, count in collections.Counter([*board, *hand]).items() if count > 1 and item != "Select"]
+    if duplicates:
+        st.warning("⚠️ There are duplicates in the cards you selected")
+        st.write(duplicates)
+
 
 
     
     try:
-
-
         evaluator = Evaluator()
-        hand = [playercard1, playercard2]
+
         p1_score = evaluator.evaluate(
             board_values, get_board_values(hand)
         )
@@ -129,10 +130,6 @@ def main():
         st.title(f"{evaluator.class_to_string(p1_class)} |  {p1_score:,} points out of 7,462")
         st.subheader('Royal Flush is equal to 1')
 
-        duplicates = [item for item, count in collections.Counter([*board, *hand]).items() if count > 1 and item != "Select"]
-        if duplicates:
-            st.warning("⚠️ There are duplicates in the cards you selected")
-            st.write(duplicates)
 
         
     except KeyError:
