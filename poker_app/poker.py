@@ -33,9 +33,10 @@ def clean_deck(cards):
 
 def open_image(card_string):
     try:
-        return Image.open(os.getcwd() + f"\\poker_app\\cards\\{clean_deck(card_string)}.png")
+        return Image.open(f"https://github.com/majoralex/streamlit/blob/main/poker_app/cards/{clean_deck(card_string)}.png")
+
     except FileNotFoundError:
-        return Image.open(os.getcwd() + f"\\poker_app\\cards\\default.jpg")
+        return Image.open(f"https://github.com/majoralex/streamlit/blob/main/poker_app/cards/default.jpg")
     
 
 def main():
