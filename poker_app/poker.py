@@ -61,6 +61,8 @@ def main():
     col1, col2, col3, col4 = st.columns(4)
     playercard1 = col1.selectbox("Card #1", options=card_labels, key="player_card_1")
     playercard2 = col2.selectbox("Card #2", options=card_labels, key="player_card_2")
+    hand = [playercard1, playercard2]
+
     col3.image(open_image(card_string=playercard1))
     col4.image(open_image(card_string=playercard2))
 
@@ -105,15 +107,12 @@ def main():
         st.error("Looks you've picked a duplicate card!")
     st.markdown("***")
     
-    hand = [playercard1, playercard2]
     board_values = get_board_values(board)
 
     duplicates = [item for item, count in collections.Counter([*board, *hand]).items() if count > 1 and item != "Select"]
     if duplicates:
         st.warning("⚠️ There are duplicates in the cards you selected")
         st.write(duplicates)
-
-
 
     
     try:
@@ -126,10 +125,8 @@ def main():
 
             # p2_class = evaluator.get_rank_class(p2_score)
 
-
         st.title(f"{evaluator.class_to_string(p1_class)} |  {p1_score:,} points out of 7,462")
         st.subheader('Royal Flush is equal to 1')
-
 
         
     except KeyError:
