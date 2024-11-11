@@ -88,7 +88,7 @@ def n_gram_multiselect_options(df: pd.DataFrame):
     """to make the loading of optioins faster"""
     return df['n_gram_string'][0:50000] #ToDo: consider changing 
 
-def mainz
+def main():
 
     st.set_page_config(
      page_title="WorldCloud | n-gram Generator",
