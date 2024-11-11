@@ -18,6 +18,8 @@ import nltk
 from tqdm import tqdm
 
 nltk.download('stopwords')
+nltk.download('wordnet')
+
 
 pd.set_option('display.max_columns', None)
 pd.set_option('display.width', 200)
