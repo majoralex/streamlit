@@ -161,7 +161,7 @@ def main():
         p1_class = evaluator.get_rank_class(p1_score)
 
         st.title(f"{evaluator.class_to_string(p1_class)} |  {p1_score:,} points out of 7,462")
-        st.subheader('Royal Flush is equal to 1')
+        st.text('Royal Flush is equal to 1')
         
         # Add hand strength visualization
         normalized_score = normalize_score(p1_score)
